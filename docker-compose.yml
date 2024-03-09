@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  caller:
+    container_name: caller
+    environment:
+      CALLER_URL: http://caller
+      ISSUER_URL: http://issuer
+    ports:
+      - "8080:80"
+    build:
+      context: ./
+      dockerfile: ./Caller/Dockerfile 
+    restart: unless-stopped
+  issuer:
+    container_name: issuer
+    build:
+      context: ./
+      dockerfile: ./Issuer/Dockerfile
+    restart: unless-stopped
