@@ -29,6 +29,12 @@ public class CallerController : ControllerBase
         _clientFactory = clientFactory;
     }
 
+    [HttpGet("health")]
+    public IActionResult Health()
+    {
+        return Ok("Healthy");
+    }
+
     [HttpGet("check/{key}")]
     public IActionResult Check(string key)
     {

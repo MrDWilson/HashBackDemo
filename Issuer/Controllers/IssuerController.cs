@@ -21,6 +21,12 @@ public class IssuerController : ControllerBase
         _cryptoService = cryptoService;
     }
 
+    [HttpGet("health")]
+    public IActionResult Health()
+    {
+        return Ok("Healthy");
+    }
+
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] Request request)
     {

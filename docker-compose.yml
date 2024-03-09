@@ -2,18 +2,30 @@ version: '3.8'
 services:
   caller:
     container_name: caller
+    build:
+      context: ./
+      dockerfile: ./Caller/Dockerfile 
     environment:
       CALLER_URL: http://caller
       ISSUER_URL: http://issuer
     ports:
       - "8080:80"
-    build:
-      context: ./
-      dockerfile: ./Caller/Dockerfile 
+    healthcheck:
+      test: curl --fail http://localhost/api/health || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     restart: unless-stopped
   issuer:
     container_name: issuer
     build:
       context: ./
       dockerfile: ./Issuer/Dockerfile
+    healthcheck:
+      test: curl --fail http://localhost/api/health || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     restart: unless-stopped
