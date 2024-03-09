@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using HashBack.Models;
 using HashBack.Services;
 
@@ -29,12 +30,6 @@ public class CallerController : ControllerBase
         _clientFactory = clientFactory;
     }
 
-    [HttpGet("health")]
-    public IActionResult Health()
-    {
-        return Ok("Healthy");
-    }
-
     [HttpGet("check/{key}")]
     public IActionResult Check(string key)
     {
@@ -51,8 +46,8 @@ public class CallerController : ControllerBase
         return NotFound();
     }
 
-    [HttpGet("run")]
-    public async Task<Token> Run()
+    [HttpGet("authenticate")]
+    public async Task<IActionResult> Authenticate()
     {
         var key = Guid.NewGuid().ToString();
         var request = new Request
@@ -66,8 +61,6 @@ public class CallerController : ControllerBase
             VerifyUrl = CallerUrl + "/api/check/" + key
         };
 
-        //HASH HERE
-
         _verificationCacheService.Add(key, _cryptoService.GetHash(request));
 
         var client = _clientFactory.CreateClient();
@@ -75,8 +68,12 @@ public class CallerController : ControllerBase
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content.ReadFromJsonAsync<Token>()
-                ?? throw new HttpRequestException("Error fetching data");
+            return Ok(await response.Content.ReadFromJsonAsync<Token>()
+                ?? throw new HttpRequestException("Error fetching data"));
+        }
+        else if(response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            return BadRequest(await response.Content.ReadAsStringAsync());
         }
         else
         {

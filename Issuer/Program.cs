@@ -1,6 +1,9 @@
 using HashBack.Services;
+using HashBack.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Load(".env");
 
 // Add services to the container.
 
@@ -12,6 +15,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<ICryptoService, CryptoService>();
+builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
+builder.Services.AddScoped<IRequestValidatorService, RequestValidatorService>();
 
 var app = builder.Build();
 

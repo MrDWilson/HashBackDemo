@@ -11,25 +11,28 @@ public class IssuerController : ControllerBase
     private readonly ILogger<IssuerController> _logger;
     private readonly IHttpClientFactory _clientFactory;
     private readonly ICryptoService _cryptoService;
+    private readonly IRequestValidatorService _requestValidatorService;
 
     public IssuerController(ILogger<IssuerController> logger,
         IHttpClientFactory clientFactory,
-        ICryptoService cryptoService)
+        ICryptoService cryptoService,
+        IRequestValidatorService requestValidatorService)
     {
         _logger = logger;
         _clientFactory = clientFactory;
         _cryptoService = cryptoService;
-    }
-
-    [HttpGet("health")]
-    public IActionResult Health()
-    {
-        return Ok("Healthy");
+        _requestValidatorService = requestValidatorService;
     }
 
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] Request request)
     {
+        var validationResult = _requestValidatorService.ValidateRequest(request);
+        if(!validationResult.Success)
+        {
+            return BadRequest(validationResult.Error);
+        }
+
         var expectedHash = _cryptoService.GetHash(request);
 
         var client = _clientFactory.CreateClient();

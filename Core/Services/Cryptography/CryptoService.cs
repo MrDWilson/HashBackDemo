@@ -17,6 +17,19 @@ public class CryptoService : ICryptoService
         return Convert.ToBase64String(random);
     }
 
+    public bool ValidateRandomString(string random)
+    {
+        try 
+        {
+            var bytes = Convert.FromBase64String(random);
+            return bytes.Length == 32;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public string GetHash(Request request)
     {
         // Canonicalize JSON request body here

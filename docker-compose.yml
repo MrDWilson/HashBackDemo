@@ -4,7 +4,9 @@ services:
     container_name: caller
     build:
       context: ./
-      dockerfile: ./Caller/Dockerfile 
+      dockerfile: Dockerfile 
+      args:
+        PROJECT_NAME: Caller
     environment:
       CALLER_URL: http://caller
       ISSUER_URL: http://issuer
@@ -21,7 +23,15 @@ services:
     container_name: issuer
     build:
       context: ./
-      dockerfile: ./Issuer/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        PROJECT_NAME: Issuer
+    environment:
+      VALID_CALLERS: http://caller
+      ISSUER_URL: http://issuer
+      KNOWN_VERSIONS: HASHBACK-PUBLIC-DRAFT-3-1
+      VALID_ROUND_RANGE: 1-99
+      ALLOWED_TIME_DRIFT: 10
     healthcheck:
       test: curl --fail http://localhost/api/health || exit 1
       interval: 60s
